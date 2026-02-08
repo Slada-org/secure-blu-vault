@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-type Status = 'active' | 'blocked' | 'frozen' | 'pending' | 'approved' | 'rejected';
+type Status = 'active' | 'blocked' | 'frozen' | 'pending' | 'approved' | 'rejected' | 'none' | 'completed';
 
 interface StatusBadgeProps {
   status: Status;
@@ -14,10 +14,12 @@ const statusConfig: Record<Status, { label: string; className: string }> = {
   pending: { label: 'Pending', className: 'status-pending' },
   approved: { label: 'Approved', className: 'status-active' },
   rejected: { label: 'Rejected', className: 'status-blocked' },
+  none: { label: 'None', className: 'bg-muted text-muted-foreground' },
+  completed: { label: 'Completed', className: 'status-active' },
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status] || { label: status, className: 'bg-muted text-muted-foreground' };
   
   return (
     <span className={cn('status-badge', config.className, className)}>
