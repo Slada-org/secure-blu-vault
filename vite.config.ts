@@ -5,6 +5,9 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // 👇 IMPORTANT for GitHub Pages project site
+  base: "/secure-blu-vault/", // <-- replace with your repo name if it's different
+
   server: {
     host: "::",
     port: 8080,
