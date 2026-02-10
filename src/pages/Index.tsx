@@ -12,10 +12,15 @@ import {
   PiggyBank,
   Building2,
   Gift,
-  QrCode,
   Store,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+import heroEarlyDeposit from "@/assets/hero-early-deposit.jpg";
+import logoOuniontrust from "@/assets/logo-ouniontrust.png";
+import heroCardLocked from "@/assets/hero-card-locked.jpg";
+import heroMonthlyFee from "@/assets/hero-monthly-fee.jpg";
+import heroAppCard from "@/assets/hero-app-card.jpg";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -42,17 +47,17 @@ export default function Index() {
     {
       icon: CreditCard,
       title: "Virtual & physical cards",
-      desc: "Use your card online, in-store, and in-wallet with Apple Pay & Google Pay.",
+      desc: "Use your card online, in-store, and in-wallet with Apple Pay & Google Play.",
     },
     {
       icon: Send,
       title: "Fast transfers",
-      desc: "Send money to anyone in seconds, 24/7, with low or no fees.",
+      desc: "Send money to anyone in seconds, 24/7.",
     },
     {
       icon: History,
-      title: "Full history",
-      desc: "Track every deposit, payment, and transfer in one clean timeline.",
+      title: "Full transaction history",
+      desc: "Track every deposit, payment and transfer in one clean timeline.",
     },
   ];
 
@@ -60,7 +65,7 @@ export default function Index() {
     {
       icon: PiggyBank,
       title: "High-yield savings",
-      desc: "Grow your money faster with a competitive APY on balances up to a set limit.",
+      desc: "Grow your money faster with a competitive APY on eligible balances.",
     },
     {
       icon: Gift,
@@ -69,8 +74,8 @@ export default function Index() {
     },
     {
       icon: Clock,
-      title: "Quarterly interest payouts",
-      desc: "See your interest land in your savings on a predictable schedule.",
+      title: "Regular interest payouts",
+      desc: "See your interest credited to your savings on a predictable schedule.",
     },
   ];
 
@@ -88,23 +93,25 @@ export default function Index() {
 
       {/* Hero + Header */}
       <div className="relative bank-card-gradient text-white overflow-hidden">
-        {/* Background circles */}
+        {/* Background decoration */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute -right-24 -top-24 w-72 h-72 rounded-full bg-white/20" />
           <div className="absolute -left-16 bottom-0 w-60 h-60 rounded-full bg-white/10" />
         </div>
 
         <div className="relative px-6 pt-10 pb-16 max-w-5xl mx-auto">
-          {/* Top nav / logo row */}
+          {/* Logo / Nav */}
           <header className="flex items-center justify-between gap-4 mb-10">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-                <Wallet className="w-6 h-6 text-white" />
-              </div>
+              <img
+                src={logoOuniontrust}
+                alt="OunionTrust Bank logo"
+                className="h-10 w-auto rounded-md bg-white/10 px-2 py-1 object-contain"
+              />
               <div className="flex flex-col">
                 <span className="text-lg font-bold font-display">OunionTrust Bank</span>
                 <span className="text-[11px] text-white/70">
-                  The everyday digital banking app
+                  Digital banking for everyday people
                 </span>
               </div>
             </div>
@@ -127,7 +134,7 @@ export default function Index() {
             </div>
           </header>
 
-          {/* Main hero content */}
+          {/* Hero content */}
           <div className="grid md:grid-cols-[1.4fr,1fr] gap-8 items-center">
             <div>
               <p className="uppercase tracking-[0.2em] text-xs font-semibold text-white/70 mb-2">
@@ -140,7 +147,7 @@ export default function Index() {
               </h1>
               <p className="text-sm sm:text-base text-white/80 mb-6 max-w-md">
                 With eligible direct deposits and opt-in, OunionTrust Bank helps you stay ahead of
-                bills, not behind them. No complicated hoops, just a mobile bank that has your back.
+                bills, not behind them. Simple banking designed to support your daily life.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -161,63 +168,21 @@ export default function Index() {
               </div>
 
               <p className="text-[11px] text-white/70 max-w-sm">
-                Overdraft protection requires eligible direct deposits and opt-in. Limits and terms
-                apply. Portfolio demo only — not a real banking service.
+                Overdraft protection requires eligible deposits and opt-in. Limits and terms apply.
               </p>
             </div>
 
-            {/* App mockup / image placeholder */}
+            {/* Hero image */}
             <div className="relative">
-              <div className="rounded-3xl bg-white/10 backdrop-blur-lg border border-white/20 p-4 shadow-xl max-w-xs ml-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex flex-col">
-                    <span className="text-xs text-white/70">OunionTrust Balance</span>
-                    <span className="text-xl font-bold font-display">$3,245.19</span>
-                  </div>
-                  <span className="text-[10px] px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-100">
-                    Up to $300 backup
-                  </span>
-                </div>
-
-                <div className="space-y-3 mb-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-white/70">Paycheck</span>
-                    <span className="text-emerald-200 font-medium">+ $1,200.00</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-white/70">Groceries</span>
-                    <span className="text-white/85">- $86.40</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-white/70">Phone bill</span>
-                    <span className="text-white/85">- $35.00</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-[11px] text-white/70">
-                  <Shield className="w-3 h-3" />
-                  <span>FDIC-style protection for demo purposes only.</span>
-                </div>
-              </div>
-
-              {/* QR image placeholder */}
-              <div className="absolute -bottom-4 -left-2 bg-white/95 rounded-2xl px-3 py-2 shadow-lg flex items-center gap-2">
-                <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center">
-                  <QrCode className="w-6 h-6 text-slate-700" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-semibold text-slate-900">
-                    Scan to get the app
-                  </span>
-                  <span className="text-[10px] text-slate-500">
-                    Download on iOS or Android
-                  </span>
-                </div>
-              </div>
+              <img
+                src={heroEarlyDeposit}
+                alt="Customer excited about early paycheck deposit from OunionTrust Bank"
+                className="w-full max-w-sm ml-auto rounded-3xl object-cover shadow-xl"
+              />
             </div>
           </div>
 
-          {/* App Store / Play Store buttons */}
+          {/* App Store buttons */}
           <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:items-center">
             <div className="flex gap-3">
               <button className="flex items-center gap-2 rounded-xl bg-black/80 px-3 py-2 text-white text-[11px]">
@@ -240,47 +205,60 @@ export default function Index() {
               </button>
             </div>
             <p className="text-[11px] text-white/70 max-w-xs">
-              App store badges shown for demo purposes. Replace with official assets for production.
+              App store badges are placeholders — replace with official assets when ready.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Main content sections */}
+      {/* Main Content Sections */}
       <main className="px-6 py-10 max-w-5xl mx-auto space-y-10">
-        {/* No monthly fees */}
+        {/* No Monthly Fees + image */}
         <section className="bg-card rounded-3xl p-6 card-shadow">
-          <div className="space-y-3 mb-5">
-            <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
-              SAY NO TO MONTHLY FEES
-            </p>
-            <h2 className="text-xl font-semibold font-display">
-              Say no to monthly fees. Say yes to keeping more of your money.
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              With OunionTrust Bank, there are no hidden surprises. Get no monthly fees after
-              qualifying direct deposits. Otherwise, a simple, transparent low monthly fee that you
-              always see up front.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• No minimum balance required</li>
-              <li>• No overdraft fees on eligible transactions</li>
-              <li>• No hidden maintenance fees or “gotchas”</li>
-            </ul>
-            <Button
-              variant="outline"
-              className="w-full sm:w-auto"
-              onClick={() => navigate("/register")}
-            >
-              No surprise fees here
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+          <div className="grid md:grid-cols-2 gap-6 items-center">
+            <div>
+              <div className="space-y-3 mb-5">
+                <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
+                  NO MONTHLY FEES
+                </p>
+                <h2 className="text-xl font-semibold font-display">
+                  Say no to monthly fees. Say yes to keeping more money.
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Enjoy no monthly fees after qualifying direct deposits. Otherwise, a simple,
+                  transparent monthly fee — no hidden charges or surprises.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>• No minimum balance</li>
+                  <li>• No hidden maintenance fees</li>
+                  <li>• No overdraft fees on eligible transactions</li>
+                </ul>
+
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => navigate("/register")}
+                >
+                  No surprise fees here
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <img
+                src={heroMonthlyFee}
+                alt="Customer happy about OunionTrust Bank monthly fee waived"
+                className="w-full rounded-3xl object-cover shadow-xl"
+              />
+            </div>
           </div>
         </section>
 
-        {/* Get your money fast */}
+        {/* Get Your Money Fast */}
         <section className="bg-card rounded-3xl p-6 card-shadow">
           <div className="space-y-3 mb-5">
             <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
@@ -290,18 +268,18 @@ export default function Index() {
               Get your pay up to 2 days early. Benefits up to 4 days early.
             </h2>
             <p className="text-sm text-muted-foreground">
-              Direct deposit your paycheck, benefits, or tax refund into your OunionTrust Bank
-              account and stop waiting for paper checks. Early access depends on your payer and
-              their deposit schedule.
+              Direct deposit your paycheck, benefits or tax refund and access your money faster.
+              Early access depends on your payer’s deposit schedule.
             </p>
           </div>
+
           <div className="grid sm:grid-cols-3 gap-4 text-sm">
             <div className="bg-muted/50 rounded-2xl p-4">
               <Clock className="w-5 h-5 mb-2 text-primary" />
               <h3 className="font-medium mb-1">Pay up to 2 days early*</h3>
               <p className="text-xs text-muted-foreground">
-                Many employers send direct deposit instructions early. We credit them as soon as we
-                receive them.
+                Many employers submit direct deposits ahead of schedule — receive them as soon as we
+                get them.
               </p>
             </div>
             <div className="bg-muted/50 rounded-2xl p-4">
@@ -315,10 +293,11 @@ export default function Index() {
               <History className="w-5 h-5 mb-2 text-primary" />
               <h3 className="font-medium mb-1">Tax refunds up to 5 days early*</h3>
               <p className="text-xs text-muted-foreground">
-                Direct deposit your refund and get your money as soon as the IRS releases it.
+                Get your tax refund as soon as it’s released — no waiting for paper checks.
               </p>
             </div>
           </div>
+
           <div className="mt-4">
             <Button variant="outline" size="sm">
               Early paydays, please
@@ -326,38 +305,39 @@ export default function Index() {
           </div>
         </section>
 
-        {/* Overdraft / backup */}
+        {/* Overdraft Protection */}
         <section className="bg-card rounded-3xl p-6 card-shadow">
           <div className="space-y-3 mb-5">
             <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
               BACKUP WHEN YOU NEED IT
             </p>
             <h2 className="text-xl font-semibold font-display">
-              Stay covered with up to $300 of backup for the “uh-oh” moments.
+              Stay covered with up to $300 of overdraft backup.
             </h2>
             <p className="text-sm text-muted-foreground">
-              We’ve all been there — that moment at the register wondering if your card will go
-              through. With overdraft protection up to $300 (when you qualify and opt in), OunionTrust
-              can help cover eligible purchases and payments when your balance runs short.
+              Whether it’s the register, the gas pump or an unexpected subscription renewal,
+              overdraft protection helps cover eligible purchases when your balance runs short.
             </p>
           </div>
+
           <div className="grid sm:grid-cols-2 gap-4 text-sm">
             <div className="bg-muted/50 rounded-2xl p-4">
               <Shield className="w-5 h-5 mb-2 text-primary" />
               <h3 className="font-medium mb-1">Up to $300 overdraft protection*</h3>
               <p className="text-xs text-muted-foreground">
-                Once you qualify, we may approve eligible purchases and payments that overdraw your
-                account, up to your limit.
+                Once you qualify, eligible card purchases and payments may be approved up to your
+                assigned limit.
               </p>
             </div>
             <div className="bg-muted/50 rounded-2xl p-4">
               <History className="w-5 h-5 mb-2 text-primary" />
-              <h3 className="font-medium mb-1">Clear activity & alerts</h3>
+              <h3 className="font-medium mb-1">Real-time alerts & insights</h3>
               <p className="text-xs text-muted-foreground">
-                See exactly when overdraft protection kicked in and manage it right from the app.
+                Stay informed whenever overdraft protection is used.
               </p>
             </div>
           </div>
+
           <div className="mt-4">
             <Button variant="outline" size="sm">
               Backup your balance
@@ -365,73 +345,85 @@ export default function Index() {
           </div>
         </section>
 
-        {/* Security section */}
+        {/* Security + Card Locked image */}
         <section className="bg-card rounded-3xl p-6 card-shadow">
-          <div className="space-y-3 mb-5">
-            <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
-              KEEP YOUR MONEY SAFE
-            </p>
-            <h2 className="text-xl font-semibold font-display">
-              It&apos;s your money — only you should have access to it.
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              OunionTrust Bank layers modern security controls to help keep your money and personal
-              information safe from the moment you open your account.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-3 gap-4">
-            {safetyFeatures.map((item) => (
-              <div key={item.title} className="bg-muted/50 rounded-2xl p-4">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  <item.icon className="w-4 h-4 text-primary" />
-                </div>
-                <h3 className="text-sm font-medium mb-1">{item.title}</h3>
-                <p className="text-xs text-muted-foreground">{item.desc}</p>
+          <div className="grid md:grid-cols-2 gap-6 items-center">
+            <div>
+              <div className="space-y-3 mb-5">
+                <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
+                  KEEP YOUR MONEY SAFE
+                </p>
+                <h2 className="text-xl font-semibold font-display">
+                  It&apos;s your money — only you should have access to it.
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  OunionTrust Bank provides multiple layers of security to help keep your account
+                  and financial information safe.
+                </p>
               </div>
-            ))}
-          </div>
-          <div className="mt-4">
-            <Button variant="outline" size="sm">
-              Stay protected
-            </Button>
+
+              <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                {safetyFeatures.map((item) => (
+                  <div key={item.title} className="bg-muted/50 rounded-2xl p-4">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                      <item.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <h3 className="text-sm font-medium mb-1">{item.title}</h3>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+
+              <Button variant="outline" size="sm">
+                Stay protected
+              </Button>
+            </div>
+
+            <div className="relative">
+              <img
+                src={heroCardLocked}
+                alt="Customer locking their OunionTrust Bank card from the app"
+                className="w-full rounded-3xl object-cover shadow-xl"
+              />
+            </div>
           </div>
         </section>
 
-        {/* Build credit */}
+        {/* Build Credit */}
         <section className="bg-card rounded-3xl p-6 card-shadow">
           <div className="space-y-3 mb-4">
             <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
-              BUILD YOUR CREDIT
+              BUILD CREDIT
             </p>
             <h2 className="text-xl font-semibold font-display">
-              Climb to better credit with no annual fee.
+              Build credit with responsible everyday use — no annual fee.
             </h2>
             <p className="text-sm text-muted-foreground">
-              Start your credit-building journey with the OunionTrust Secured Visa®-style Credit
-              Card. No annual fee, no credit check for this demo experience, and no impact to your
-              real credit when you apply here — because this is a portfolio project, not a real
-              bank.
+              Take the next step in your financial journey with the OunionTrust Secured Credit Card.
+              No annual fee and straightforward tools to help build positive payment history.
             </p>
           </div>
+
           <div className="grid sm:grid-cols-2 gap-4 text-sm">
             <div className="bg-muted/50 rounded-2xl p-4">
               <CreditCard className="w-5 h-5 mb-2 text-primary" />
-              <h3 className="font-medium mb-1">Build credit with everyday use</h3>
+              <h3 className="font-medium mb-1">Build credit with consistent payments</h3>
               <p className="text-xs text-muted-foreground">
-                Pay on time and build positive payment history the simple way.
+                Payments are reported to major credit bureaus to help build your score over time.
               </p>
             </div>
             <div className="bg-muted/50 rounded-2xl p-4">
               <PiggyBank className="w-5 h-5 mb-2 text-primary" />
-              <h3 className="font-medium mb-1">No annual fee*</h3>
+              <h3 className="font-medium mb-1">No annual fee</h3>
               <p className="text-xs text-muted-foreground">
-                Keep more of your money while you work on your credit journey.
+                Access credit-building tools without annual costs.
               </p>
             </div>
           </div>
+
           <div className="mt-4">
             <Button variant="outline" size="sm">
-              Ready, set, credit
+              Start building credit
             </Button>
           </div>
         </section>
@@ -440,41 +432,40 @@ export default function Index() {
         <section className="bg-card rounded-3xl p-6 card-shadow">
           <div className="space-y-3 mb-4">
             <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
-              ACCESS TO CASH
+              NATIONWIDE ACCESS
             </p>
             <h2 className="text-xl font-semibold font-display">
               Free ATMs here, there, everywhere.
             </h2>
             <p className="text-sm text-muted-foreground">
-              Withdraw cash fee-free at participating ATMs nationwide. Use the in-app ATM finder to
-              locate your nearest free withdrawal spot.
+              Withdraw cash free at eligible ATMs nationwide. Use the ATM locator in the app to find
+              your nearest free cash withdrawal point.
             </p>
           </div>
+
           <div className="flex items-start gap-3 text-sm">
             <Store className="w-5 h-5 mt-1 text-primary" />
             <p className="text-xs text-muted-foreground">
-              Exact ATM networks, locations, and availability would depend on real-world partners in
-              a production bank. In this portfolio project, the feature is shown as a realistic
-              concept.
+              ATM availability depends on participating networks and retailer partnerships.
             </p>
           </div>
         </section>
 
-        {/* High-yield savings */}
+        {/* Savings */}
         <section className="bg-card rounded-3xl p-6 card-shadow">
           <div className="space-y-3 mb-5">
             <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
               SAVE SMARTER
             </p>
             <h2 className="text-xl font-semibold font-display">
-              A high-yield savings account to save the day.
+              A high-yield savings account to supercharge your goals.
             </h2>
             <p className="text-sm text-muted-foreground">
-              Make quick work of your savings goals with a high-yield savings account and interest
-              paid regularly on eligible balances. Create separate goals, automate contributions,
-              and track your progress in the app.
+              Track progress on savings goals, automate contributions and earn a competitive APY
+              with interest credited regularly.
             </p>
           </div>
+
           <div className="grid sm:grid-cols-3 gap-4">
             {savingsBenefits.map((item) => (
               <div key={item.title} className="bg-muted/50 rounded-2xl p-4">
@@ -488,41 +479,42 @@ export default function Index() {
           </div>
         </section>
 
-        {/* Deposit / Cash checks / Cash back */}
-        <section className="bg-card rounded-3xl p-6 card-shadow space-y-6">
-          <div className="space-y-2">
-            <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground">
-              EVERYDAY MONEY MOVES
-            </p>
-            <h2 className="text-xl font-semibold font-display">
-              Your everyday money, managed in one app.
-            </h2>
-          </div>
+        {/* Everyday money tools + App image */}
+        <section className="bg-card rounded-3xl p-6 card-shadow">
+          <div className="grid md:grid-cols-2 gap-6 items-center">
+            <div className="order-2 md:order-1">
+              <p className="uppercase text-[11px] tracking-[0.18em] text-muted-foreground mb-2">
+                EVERYDAY MONEY
+              </p>
+              <h2 className="text-xl font-semibold font-display mb-3">
+                All your day-to-day money tools in one app.
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Manage your balance, move money, control your card and keep an eye on spending from
+                a single, powerful app experience.
+              </p>
 
-          <div className="grid sm:grid-cols-3 gap-4 text-sm">
-            <div className="bg-muted/50 rounded-2xl p-4">
-              <Store className="w-5 h-5 mb-2 text-primary" />
-              <h3 className="font-medium mb-1">Deposit cash at nearby stores</h3>
-              <p className="text-xs text-muted-foreground">
-                In a real deployment, partner retailers would let you deposit cash at the register.
-                Here, the flow is represented as a realistic portfolio interaction.
-              </p>
+              <div className="space-y-3">
+                {moneyTools.map((tool) => (
+                  <div key={tool.title} className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+                      <tool.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">{tool.title}</h3>
+                      <p className="text-xs text-muted-foreground">{tool.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="bg-muted/50 rounded-2xl p-4">
-              <History className="w-5 h-5 mb-2 text-primary" />
-              <h3 className="font-medium mb-1">Cash checks fast or for free</h3>
-              <p className="text-xs text-muted-foreground">
-                Snap a photo of your check and choose instant access for a fee, or standard access
-                at no extra cost.
-              </p>
-            </div>
-            <div className="bg-muted/50 rounded-2xl p-4">
-              <Gift className="w-5 h-5 mb-2 text-primary" />
-              <h3 className="font-medium mb-1">Earn instant cash back</h3>
-              <p className="text-xs text-muted-foreground">
-                Buy eGift cards from popular merchants inside the app to earn instant cash back to
-                your account.
-              </p>
+
+            <div className="order-1 md:order-2">
+              <img
+                src={heroAppCard}
+                alt="OunionTrust Bank mobile app and debit card"
+                className="w-full rounded-3xl object-cover shadow-xl"
+              />
             </div>
           </div>
         </section>
@@ -530,15 +522,13 @@ export default function Index() {
         {/* Final CTA */}
         <section className="bg-primary rounded-3xl p-6 text-primary-foreground text-center space-y-3">
           <p className="uppercase text-[11px] tracking-[0.18em] text-primary-foreground/80">
-            THIS WAY TO EARLY PAYDAY
+            EARLY DIRECT DEPOSIT
           </p>
           <h2 className="text-2xl font-semibold font-display">
             Get your pay up to 2 days early with direct deposit.
           </h2>
           <p className="text-sm max-w-xl mx-auto text-primary-foreground/90">
-            Open your OunionTrust Bank account in minutes, set up direct deposit, and experience a
-            modern way to manage your everyday money. Designed as a realistic digital banking
-            experience for your portfolio.
+            Open your OunionTrust Bank account in minutes and get faster access to your money.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-3">
             <Button
@@ -554,7 +544,7 @@ export default function Index() {
         </section>
       </main>
 
-      {/* Footer with legal */}
+      {/* Footer */}
       <footer className="border-t border-muted mt-8">
         <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
           <div className="grid sm:grid-cols-4 gap-6 text-xs">
@@ -564,58 +554,49 @@ export default function Index() {
                 <li>Open an account</li>
                 <li>Activate your card</li>
                 <li>Get the app</li>
-                <li>Direct deposit</li>
+                <li>Find ATMs</li>
                 <li>Build credit</li>
               </ul>
             </div>
+
             <div className="space-y-2">
               <p className="text-[11px] font-semibold uppercase tracking-wide">Resources</p>
               <ul className="space-y-1 text-muted-foreground">
                 <li>Help Center</li>
-                <li>Quick help guides</li>
-                <li>Contact support</li>
-                <li>Blog</li>
+                <li>FAQs</li>
+                <li>Support</li>
+                <li>Guides</li>
               </ul>
             </div>
+
             <div className="space-y-2">
               <p className="text-[11px] font-semibold uppercase tracking-wide">About</p>
               <ul className="space-y-1 text-muted-foreground">
                 <li>About OunionTrust Bank</li>
-                <li>Careers (demo)</li>
                 <li>Security</li>
-                <li>Site map</li>
+                <li>News</li>
+                <li>Careers</li>
               </ul>
             </div>
+
             <div className="space-y-2">
               <p className="text-[11px] font-semibold uppercase tracking-wide">Legal</p>
               <ul className="space-y-1 text-muted-foreground">
                 <li>Account agreements</li>
                 <li>Privacy statement</li>
-                <li>Site terms of use</li>
-                <li>Overdraft protection notice</li>
+                <li>Terms of use</li>
+                <li>Overdraft policy</li>
               </ul>
             </div>
           </div>
 
           <div className="space-y-2 text-[10px] text-muted-foreground leading-relaxed">
             <p>
-              * Features such as overdraft protection, early direct deposit, credit-building cards,
-              and ATM access are shown here as part of a realistic portfolio design. In a real bank,
-              these would depend on eligibility, partner networks, and applicable terms and
-              conditions.
-            </p>
-            <p>
-              Online access, identity verification, and device checks would typically be required to
-              open and use an account. The content and flows here are for demonstration purposes
-              only and do not represent a real financial product.
-            </p>
-            <p>
-              All third-party names and logos (such as Visa, Apple, and Google) would be trademarks
-              of their respective owners in a production environment. This portfolio project is not
-              affiliated with, sponsored by, or endorsed by any real bank or financial institution.
+              Features like overdraft protection, early direct deposit and ATM access depend on
+              eligibility and applicable terms. See account documents for full details.
             </p>
             <p className="mt-2">
-              © 2026 OunionTrust Bank — Portfolio Demo. All rights reserved.
+              © {new Date().getFullYear()} OunionTrust Bank. All rights reserved.
             </p>
           </div>
         </div>
