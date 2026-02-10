@@ -40,82 +40,125 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        {/* 👇 KEY CHANGE: tell React Router the base path */}
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Routes>
             {/* Landing */}
             <Route path="/" element={<Index />} />
-            
+
             {/* Auth Routes */}
             <Route path="/login" element={<CustomerLogin />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/forgot-password" element={<ForgotPassword variant="customer" />} />
-            <Route path="/admin/forgot-password" element={<ForgotPassword variant="admin" />} />
-            
+            <Route
+              path="/forgot-password"
+              element={<ForgotPassword variant="customer" />}
+            />
+            <Route
+              path="/admin/forgot-password"
+              element={<ForgotPassword variant="admin" />}
+            />
+
             {/* Customer Routes (Protected) */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <CustomerDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/transactions" element={
-              <ProtectedRoute>
-                <TransactionHistory />
-              </ProtectedRoute>
-            } />
-            <Route path="/send-money" element={
-              <ProtectedRoute>
-                <SendMoney />
-              </ProtectedRoute>
-            } />
-            <Route path="/cards" element={
-              <ProtectedRoute>
-                <CardsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/notifications" element={
-              <ProtectedRoute>
-                <NotificationsPage />
-              </ProtectedRoute>
-            } />
-            
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <CustomerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/transactions"
+              element={
+                <ProtectedRoute>
+                  <TransactionHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/send-money"
+              element={
+                <ProtectedRoute>
+                  <SendMoney />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cards"
+              element={
+                <ProtectedRoute>
+                  <CardsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute>
+                  <NotificationsPage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Admin Routes (Protected) */}
-            <Route path="/admin" element={
-              <ProtectedRoute requireAdmin>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/customers" element={
-              <ProtectedRoute requireAdmin>
-                <CustomerManagement />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/customers/:customerId" element={
-              <ProtectedRoute requireAdmin>
-                <CustomerDetail />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/transfers" element={
-              <ProtectedRoute requireAdmin>
-                <PendingTransfers />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/requests" element={
-              <ProtectedRoute requireAdmin>
-                <CardRequests />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/activity" element={
-              <ProtectedRoute requireAdmin>
-                <ActivityLog />
-              </ProtectedRoute>
-            } />
-            
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/customers"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <CustomerManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/customers/:customerId"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <CustomerDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/transfers"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <PendingTransfers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/requests"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <CardRequests />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/activity"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <ActivityLog />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
           </Routes>
