@@ -288,7 +288,7 @@ const handleSearch = async (query: string) => {
             <input
               type="text"
               value={recipient}
-              onChange={(e) => (e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               placeholder="Account number or name"
               className="input-bank pl-12"
             />
