@@ -37,80 +37,38 @@ export default function SendMoney() {
 
   const canSendMoney = customer?.can_send_money && customer?.status === 'active';
 
-  const handleSearch = async (query: string) => {
-    setRecipient(query);
-    if (query.length < 3) {
-      setSearchResults([]);
-      return;
-    }
+const handleSearch = async (query: string) => {
+  setRecipient(query);
 
-    setIsSearching(true);
-    try {
-      const { data: customers, error: customersError } = await supabase
-        .from('customers')
-        .select('id, user_id, account_number')
-        .or(`account_number.ilike.%${query}%`)
-        .neq('user_id', customer?.user_id)
-        .limit(5);
+  if (query.length < 3) {
+    setSearchResults([]);
+    return;
+  }
 
-      if (customersError) throw customersError;
+  setIsSearching(true);
 
-      if (customers && customers.length > 0) {
-        const userIds = customers.map(c => c.user_id);
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('user_id, name, email')
-          .in('user_id', userIds);
+  try {
+    const { data, error } = await supabase.rpc('search_recipients', { query });
 
-        const results = customers.map(c => {
-          const p = profiles?.find(p => p.user_id === c.user_id);
-          return {
-            id: c.id,
-            name: p?.name || 'Unknown',
-            accountNumber: c.account_number,
-          };
-        }).filter(r =>
-          r.name.toLowerCase().includes(query.toLowerCase()) ||
-          r.accountNumber.includes(query)
-        );
+    if (error) throw error;
 
-        setSearchResults(results);
-      } else {
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('user_id, name, email')
-          .ilike('name', `%${query}%`)
-          .neq('user_id', customer?.user_id)
-          .limit(5);
+    const results = (data ?? [])
+      .filter((r) => r.user_id !== customer?.user_id)
+      .map((r) => ({
+        id: r.customer_id,
+        name: r.name || 'Unknown',
+        accountNumber: r.account_number,
+      }));
 
-        if (profiles && profiles.length > 0) {
-          const userIds = profiles.map(p => p.user_id);
-          const { data: customersData } = await supabase
-            .from('customers')
-            .select('id, user_id, account_number')
-            .in('user_id', userIds);
+    setSearchResults(results);
 
-          const results = profiles.map(p => {
-            const c = customersData?.find(c => c.user_id === p.user_id);
-            return c ? {
-              id: c.id,
-              name: p.name,
-              accountNumber: c.account_number,
-            } : null;
-          }).filter(Boolean) as RecipientData[];
-
-          setSearchResults(results);
-        } else {
-          setSearchResults([]);
-        }
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
+  } catch (error) {
+    console.error('Search error:', error);
+    setSearchResults([]);
+  } finally {
+    setIsSearching(false);
+  }
+};
 
   const handleRecipientSelect = (recipientData: RecipientData) => {
     setSelectedRecipient(recipientData);
