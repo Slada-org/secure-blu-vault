@@ -108,27 +108,14 @@ const handleSearch = async (query: string) => {
       const transferAmount = parseFloat(amount);
       const isInternal = transferType === 'domestic' && selectedRecipient.id !== 'international';
 
-      if (isInternal) {
-        // Internal transfer: deduct sender, credit recipient, status = completed
-        const { error: deductError } = await supabase
-          .from('customers')
-          .update({ balance: Number(customer.balance) - transferAmount })
-          .eq('id', customer.id);
-        if (deductError) throw deductError;
+if (isInternal) {
+  const { error } = await supabase.rpc("transfer_internal", {
+    recipient_customer_id: selectedRecipient.id,
+    transfer_amount: transferAmount,
+  });
+  if (error) throw error;
+} else {
 
-        const { data: recipientData } = await supabase
-          .from('customers')
-          .select('balance')
-          .eq('id', selectedRecipient.id)
-          .single();
-
-        if (recipientData) {
-          await supabase
-            .from('customers')
-            .update({ balance: Number(recipientData.balance) + transferAmount })
-            .eq('id', selectedRecipient.id);
-        }
-      } else {
         // External transfer: deduct sender, status = pending (admin must approve)
         const { error: deductError } = await supabase
           .from('customers')
