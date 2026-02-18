@@ -126,6 +126,7 @@ if (isInternal) {
 
       const result = await createTransaction.mutateAsync({
         type: 'debit',
+        customer_id: customer.id,
         amount: transferAmount,
         description: note || `${transferType === 'domestic' ? 'Domestic' : 'International'} wire to ${selectedRecipient.name}`,
         recipient_name: selectedRecipient.name,
