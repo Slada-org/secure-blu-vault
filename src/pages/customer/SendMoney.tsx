@@ -100,35 +100,53 @@ const handleSearch = async (query: string) => {
   // Check if recipient is internal (same bank) based on whether they were found in our customers table
   const isInternalTransfer = selectedRecipient !== null; // All searchable recipients are internal
 
-  const handleSend = async () => {
-    if (!customer || !selectedRecipient || !canSendMoney) return;
+  const requireFaceIdOrPasskey = async () => {
+  // Frontend-only demo gate. Works only if the device/browser supports passkeys
+  // and the user already has a passkey available for the site.
+  if (!window.PublicKeyCredential || !navigator.credentials) return false;
 
-    setIsLoading(true);
-    try {
+  try {
+    const challenge = new Uint8Array(32);
+    crypto.getRandomValues(challenge);
+
+    await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        timeout: 60000,
+        userVerification: "required",
+      },
+    });
+
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const handleSend = async () => {
+  if (!customer || !selectedRecipient || !canSendMoney) return;
+
+  // ✅ FaceID/Passkey prompt (frontend-only demo gate)
+  const ok = await requireFaceIdOrPasskey();
+  if (!ok) {
+    toast.error("Authentication cancelled or not supported");
+    return;
+  }
+
+  setIsLoading(true);
+  try {
+
       const transferAmount = parseFloat(amount);
       const isInternal = transferType === 'domestic' && selectedRecipient.id !== 'international';
 
-      if (isInternal) {
-        // Internal transfer: deduct sender, credit recipient, status = completed
-        const { error: deductError } = await supabase
-          .from('customers')
-          .update({ balance: Number(customer.balance) - transferAmount })
-          .eq('id', customer.id);
-        if (deductError) throw deductError;
+if (isInternal) {
+  const { error } = await supabase.rpc("transfer_internal", {
+    recipient_customer_id: selectedRecipient.id,
+    transfer_amount: transferAmount,
+  });
+  if (error) throw error;
+} else {
 
-        const { data: recipientData } = await supabase
-          .from('customers')
-          .select('balance')
-          .eq('id', selectedRecipient.id)
-          .single();
-
-        if (recipientData) {
-          await supabase
-            .from('customers')
-            .update({ balance: Number(recipientData.balance) + transferAmount })
-            .eq('id', selectedRecipient.id);
-        }
-      } else {
         // External transfer: deduct sender, status = pending (admin must approve)
         const { error: deductError } = await supabase
           .from('customers')
@@ -139,12 +157,34 @@ const handleSearch = async (query: string) => {
 
       const result = await createTransaction.mutateAsync({
         type: 'debit',
+        customer_id: customer.id,
         amount: transferAmount,
         description: note || `${transferType === 'domestic' ? 'Domestic' : 'International'} wire to ${selectedRecipient.name}`,
         recipient_name: selectedRecipient.name,
         recipient_account: selectedRecipient.accountNumber,
         status: isInternal ? 'completed' : 'pending',
       });
+
+      // ✅ Add recipient-side transaction so it appears in their history
+if (isInternal) {
+  const { error: creditTxnError } = await supabase
+    .from("transactions")
+    .insert({
+      customer_id: selectedRecipient.id, // recipient customer row id
+      type: "credit",
+      amount: transferAmount,
+      description: note || `Transfer from ${profile?.name || "Sender"}`,
+      sender_name: profile?.name || null,
+      sender_account: customer.account_number,
+      recipient_name: selectedRecipient.name,
+      recipient_account: selectedRecipient.accountNumber,
+      status: "completed",
+      reference: result.reference, // same reference links both sides
+    });
+
+  if (creditTxnError) throw creditTxnError;
+}
+
 
       setLastReference(result.reference);
       await refetchCustomer();
