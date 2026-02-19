@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { ArrowLeft, User, AtSign, Send, CheckCircle, Globe, Building2, FileDown } from 'lucide-react';
+import {
+  ArrowLeft,
+  User,
+  AtSign,
+  Send,
+  CheckCircle,
+  Globe,
+  Building2,
+  FileDown,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useCustomer } from '@/hooks/useCustomer';
@@ -7,7 +16,9 @@ import { useTransactions } from '@/hooks/useTransactions';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { generateTransferReceipt } from '@/lib/generateTransferReceipt';
-import InternationalRecipientForm, { type InternationalRecipientData } from '@/components/bank/InternationalRecipientForm';
+import InternationalRecipientForm, {
+  type InternationalRecipientData,
+} from '@/components/bank/InternationalRecipientForm';
 
 const ROUTING_NUMBER = '021000021';
 
@@ -23,52 +34,57 @@ export default function SendMoney() {
   const navigate = useNavigate();
   const { customer, profile, refetchCustomer } = useCustomer();
   const { createTransaction } = useTransactions();
-  const [step, setStep] = useState<'type' | 'recipient' | 'amount' | 'confirm' | 'success'>('type');
+
+  const [step, setStep] = useState<
+    'type' | 'recipient' | 'amount' | 'confirm' | 'success'
+  >('type');
+
   const [transferType, setTransferType] = useState<TransferType>('domestic');
   const [recipient, setRecipient] = useState('');
-  const [selectedRecipient, setSelectedRecipient] = useState<RecipientData | null>(null);
+  const [selectedRecipient, setSelectedRecipient] = useState<RecipientData | null>(
+    null
+  );
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<RecipientData[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [lastReference, setLastReference] = useState('');
-  const [internationalData, setInternationalData] = useState<InternationalRecipientData | null>(null);
+  const [internationalData, setInternationalData] =
+    useState<InternationalRecipientData | null>(null);
 
   const canSendMoney = customer?.can_send_money && customer?.status === 'active';
 
-const handleSearch = async (query: string) => {
-  setRecipient(query);
+  const handleSearch = async (query: string) => {
+    setRecipient(query);
 
-  if (query.length < 3) {
-    setSearchResults([]);
-    return;
-  }
+    if (query.length < 3) {
+      setSearchResults([]);
+      return;
+    }
 
-  setIsSearching(true);
+    setIsSearching(true);
 
-  try {
-    const { data, error } = await supabase.rpc('search_recipients', { query });
+    try {
+      const { data, error } = await supabase.rpc('search_recipients', { query });
+      if (error) throw error;
 
-    if (error) throw error;
+      const results = (data ?? [])
+        .filter((r: any) => r.user_id !== customer?.user_id)
+        .map((r: any) => ({
+          id: r.customer_id,
+          name: r.name || 'Unknown',
+          accountNumber: r.account_number,
+        }));
 
-    const results = (data ?? [])
-      .filter((r) => r.user_id !== customer?.user_id)
-      .map((r) => ({
-        id: r.customer_id,
-        name: r.name || 'Unknown',
-        accountNumber: r.account_number,
-      }));
-
-    setSearchResults(results);
-
-  } catch (error) {
-    console.error('Search error:', error);
-    setSearchResults([]);
-  } finally {
-    setIsSearching(false);
-  }
-};
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const handleRecipientSelect = (recipientData: RecipientData) => {
     setSelectedRecipient(recipientData);
@@ -97,94 +113,54 @@ const handleSearch = async (query: string) => {
     setStep('confirm');
   };
 
-  // Check if recipient is internal (same bank) based on whether they were found in our customers table
-  const isInternalTransfer = selectedRecipient !== null; // All searchable recipients are internal
+  const handleSend = async () => {
+    if (!customer || !selectedRecipient || !canSendMoney) return;
 
-  const requireFaceIdOrPasskey = async () => {
-  // Frontend-only demo gate. Works only if the device/browser supports passkeys
-  // and the user already has a passkey available for the site.
-  if (!window.PublicKeyCredential || !navigator.credentials) return false;
-
-  try {
-    const challenge = new Uint8Array(32);
-    crypto.getRandomValues(challenge);
-
-    await navigator.credentials.get({
-      publicKey: {
-        challenge,
-        timeout: 60000,
-        userVerification: "required",
-      },
-    });
-
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const handleSend = async () => {
-  if (!customer || !selectedRecipient || !canSendMoney) return;
-
-  // ✅ FaceID/Passkey prompt (frontend-only demo gate)
-  const ok = await requireFaceIdOrPasskey();
-  if (!ok) {
-    toast.error("Authentication cancelled or not supported");
-    return;
-  }
-
-  setIsLoading(true);
-  try {
-
+    setIsLoading(true);
+    try {
       const transferAmount = parseFloat(amount);
-      const isInternal = transferType === 'domestic' && selectedRecipient.id !== 'international';
+      const isInternal =
+        transferType === 'domestic' && selectedRecipient.id !== 'international';
 
-if (isInternal) {
-  const { error } = await supabase.rpc("transfer_internal", {
-    recipient_customer_id: selectedRecipient.id,
-    transfer_amount: transferAmount,
-  });
-  if (error) throw error;
-} else {
-
+      if (isInternal) {
+        // ✅ Internal transfer MUST handle:
+        // - debit sender
+        // - credit recipient
+        // - insert BOTH transactions (sender debit + recipient credit)
+        // inside the RPC, due to RLS.
+        const { error } = await supabase.rpc('transfer_internal', {
+          recipient_customer_id: selectedRecipient.id,
+          transfer_amount: transferAmount,
+          // if your rpc supports it, you can pass note/description too:
+          // transfer_note: note || null,
+        });
+        if (error) throw error;
+      } else {
         // External transfer: deduct sender, status = pending (admin must approve)
         const { error: deductError } = await supabase
           .from('customers')
           .update({ balance: Number(customer.balance) - transferAmount })
           .eq('id', customer.id);
+
         if (deductError) throw deductError;
       }
 
+      // ✅ Sender-side transaction (debit)
+      // NOTE: this only ensures the SENDER sees it in their history.
+      // The RECIPIENT credit row must be created inside transfer_internal.
       const result = await createTransaction.mutateAsync({
         type: 'debit',
         customer_id: customer.id,
         amount: transferAmount,
-        description: note || `${transferType === 'domestic' ? 'Domestic' : 'International'} wire to ${selectedRecipient.name}`,
+        description:
+          note ||
+          `${
+            transferType === 'domestic' ? 'Domestic' : 'International'
+          } wire to ${selectedRecipient.name}`,
         recipient_name: selectedRecipient.name,
         recipient_account: selectedRecipient.accountNumber,
         status: isInternal ? 'completed' : 'pending',
       });
-
-      // ✅ Add recipient-side transaction so it appears in their history
-if (isInternal) {
-  const { error: creditTxnError } = await supabase
-    .from("transactions")
-    .insert({
-      customer_id: selectedRecipient.id, // recipient customer row id
-      type: "credit",
-      amount: transferAmount,
-      description: note || `Transfer from ${profile?.name || "Sender"}`,
-      sender_name: profile?.name || null,
-      sender_account: customer.account_number,
-      recipient_name: selectedRecipient.name,
-      recipient_account: selectedRecipient.accountNumber,
-      status: "completed",
-      reference: result.reference, // same reference links both sides
-    });
-
-  if (creditTxnError) throw creditTxnError;
-}
-
 
       setLastReference(result.reference);
       await refetchCustomer();
@@ -213,10 +189,12 @@ if (isInternal) {
     });
   };
 
-  const formattedAmount = amount ? new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(parseFloat(amount)) : '$0.00';
+  const formattedAmount = amount
+    ? new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(parseFloat(amount))
+    : '$0.00';
 
   const goBack = () => {
     if (step === 'type') navigate(-1);
@@ -232,7 +210,9 @@ if (isInternal) {
         <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mb-6">
           <Send className="w-10 h-10 text-destructive" />
         </div>
-        <h2 className="text-2xl font-bold mb-2 font-display">Transfers Disabled</h2>
+        <h2 className="text-2xl font-bold mb-2 font-display">
+          Transfers Disabled
+        </h2>
         <p className="text-muted-foreground mb-8">
           {customer?.status === 'frozen'
             ? 'Your account is frozen. Please contact support.'
@@ -240,7 +220,11 @@ if (isInternal) {
             ? 'Your account is blocked. Please contact support.'
             : 'Money transfers have been disabled on your account.'}
         </p>
-        <Button onClick={() => navigate('/dashboard')} variant="outline" className="w-full max-w-xs">
+        <Button
+          onClick={() => navigate('/dashboard')}
+          variant="outline"
+          className="w-full max-w-xs"
+        >
           Back to Dashboard
         </Button>
       </div>
@@ -263,13 +247,20 @@ if (isInternal) {
       {step === 'type' && (
         <div className="p-4 space-y-6">
           <div className="text-center py-4">
-            <h2 className="text-xl font-semibold font-display mb-2">Select Transfer Type</h2>
-            <p className="text-muted-foreground text-sm">Choose the type of wire transfer</p>
+            <h2 className="text-xl font-semibold font-display mb-2">
+              Select Transfer Type
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Choose the type of wire transfer
+            </p>
           </div>
 
           <div className="space-y-4">
             <button
-              onClick={() => { setTransferType('domestic'); setStep('recipient'); }}
+              onClick={() => {
+                setTransferType('domestic');
+                setStep('recipient');
+              }}
               className="w-full flex items-center gap-4 p-5 bg-card rounded-2xl card-shadow hover:bg-muted transition-colors text-left"
             >
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -284,7 +275,10 @@ if (isInternal) {
             </button>
 
             <button
-              onClick={() => { setTransferType('international'); setStep('recipient'); }}
+              onClick={() => {
+                setTransferType('international');
+                setStep('recipient');
+              }}
               className="w-full flex items-center gap-4 p-5 bg-card rounded-2xl card-shadow hover:bg-muted transition-colors text-left"
             >
               <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center">
@@ -304,7 +298,9 @@ if (isInternal) {
             <p className="text-sm text-muted-foreground">Your Account Details</p>
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Account Number</span>
-              <span className="text-sm font-mono font-medium">{customer?.account_number}</span>
+              <span className="text-sm font-mono font-medium">
+                {customer?.account_number}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Routing Number</span>
@@ -353,7 +349,9 @@ if (isInternal) {
                     </div>
                     <div className="flex-1 text-left">
                       <p className="font-medium text-foreground">{result.name}</p>
-                      <p className="text-sm text-muted-foreground">•••• {result.accountNumber.slice(-4)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        •••• {result.accountNumber.slice(-4)}
+                      </p>
                     </div>
                   </button>
                 ))}
@@ -387,7 +385,10 @@ if (isInternal) {
           <div className="flex items-center justify-center gap-3 py-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-lg font-semibold text-primary">
-                {selectedRecipient.name.split(' ').map(n => n[0]).join('')}
+                {selectedRecipient.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')}
               </span>
             </div>
             <div>
@@ -434,7 +435,10 @@ if (isInternal) {
             />
           </div>
 
-          <Button onClick={handleAmountConfirm} className="w-full h-12 btn-gradient text-base font-semibold">
+          <Button
+            onClick={handleAmountConfirm}
+            className="w-full h-12 btn-gradient text-base font-semibold"
+          >
             Continue
           </Button>
         </div>
@@ -447,11 +451,13 @@ if (isInternal) {
             <div className="text-center">
               <p className="text-muted-foreground mb-2">You're sending</p>
               <p className="text-4xl font-bold balance-text">{formattedAmount}</p>
-              <span className={`inline-block mt-2 text-xs px-3 py-1 rounded-full font-medium ${
-                transferType === 'domestic'
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-accent/10 text-accent'
-              }`}>
+              <span
+                className={`inline-block mt-2 text-xs px-3 py-1 rounded-full font-medium ${
+                  transferType === 'domestic'
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-accent/10 text-accent'
+                }`}
+              >
                 {transferType === 'domestic' ? 'Domestic Wire' : 'International Wire'}
               </span>
             </div>
@@ -461,10 +467,14 @@ if (isInternal) {
                 <span className="text-muted-foreground">To</span>
                 <span className="font-medium">{selectedRecipient.name}</span>
               </div>
+
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Account</span>
-                <span className="font-medium font-mono text-right max-w-[60%] break-all">{selectedRecipient.accountNumber}</span>
+                <span className="font-medium font-mono text-right max-w-[60%] break-all">
+                  {selectedRecipient.accountNumber}
+                </span>
               </div>
+
               {internationalData && (
                 <>
                   <div className="flex justify-between">
@@ -473,12 +483,16 @@ if (isInternal) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Bank Name</span>
-                    <span className="font-medium text-right max-w-[60%]">{internationalData.bankName}</span>
+                    <span className="font-medium text-right max-w-[60%]">
+                      {internationalData.bankName}
+                    </span>
                   </div>
                   {internationalData.bankRoutingNumber && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Bank Routing</span>
-                      <span className="font-medium font-mono">{internationalData.bankRoutingNumber}</span>
+                      <span className="font-medium font-mono">
+                        {internationalData.bankRoutingNumber}
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between">
@@ -487,26 +501,31 @@ if (isInternal) {
                   </div>
                 </>
               )}
+
               <div className="flex justify-between">
                 <span className="text-muted-foreground">From Account</span>
                 <span className="font-medium font-mono">{customer?.account_number}</span>
               </div>
+
               {transferType === 'domestic' && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Routing Number</span>
                   <span className="font-medium font-mono">{ROUTING_NUMBER}</span>
                 </div>
               )}
+
               {note && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Note</span>
                   <span className="font-medium">{note}</span>
                 </div>
               )}
+
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Fee</span>
                 <span className="font-medium text-success">Free</span>
               </div>
+
               {transferType === 'international' && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Status</span>
